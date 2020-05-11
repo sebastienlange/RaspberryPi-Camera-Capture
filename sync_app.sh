@@ -1,0 +1,1 @@
+rclone sync dropbox:EnergySuD/RaspberryPi/Python /home/pi/Documents/EnergySuD --progress
