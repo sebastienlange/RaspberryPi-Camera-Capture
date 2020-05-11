@@ -27,8 +27,8 @@ def do_run_command(command, should_log=True):
 
 def clean_logs(logs):
     for log in logs.strip().splitlines():
-        if 'ERROR' in log:
-            yield ''.join(log[log.find('ERROR') + len('ERROR'):]).strip(': '), logging.ERROR
+        if 'error' in log.lower():
+            yield ''.join(log[log.lower().find('error') + len('error'):]).strip(': '), logging.ERROR
         else:
             yield log.strip(), logging.INFO
 
@@ -57,12 +57,14 @@ def do_sync_dropbox(app_name_to_watch_for_reboot):
                                 shell=True, text=True, capture_output=True)
         for std in [result.stdout, result.stderr]:
             for log, level in clean_logs(std):
-                app_changed = app_name_to_watch_for_reboot in log
-                log = f'{log}' + (
-                    ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
-                logging.log(level, log)
-                if app_changed:
-                    should_reboot = True
+                if level != logging.INFO or all(
+                        msg not in log for msg in ['Déjà à jour', 'Depuis https://github.com', '* branch']):
+                    app_changed = app_name_to_watch_for_reboot in log
+                    log = f'{log}' + (
+                        ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
+                    logging.log(level, log)
+                    if app_changed:
+                        should_reboot = True
 
         if should_reboot:
             run_command('sudo reboot', f'Rebooting to take changes to code into account', thread=True)
