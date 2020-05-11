@@ -26,6 +26,13 @@
 			"every": "minutes",
 			"interval": 5,
 			"enabled": true,
+			"command": "git -C /home/pi/Documents/RaspberryPi-Camera-Capture pull origin master",
+			"tag": "sync app with GitHub"
+		},
+		{
+			"every": "minutes",
+			"interval": 5,
+			"enabled": true,
 			"tag": "sync files with Dropbox"
 		},
 		{
