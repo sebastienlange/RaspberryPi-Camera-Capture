@@ -19,6 +19,7 @@ from datetime import datetime
 
 APP_NAME = pathlib.Path(__file__).name
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
+PICTURES_PATH = '/home/pi/Pictures/EnergySuD'
 CONFIG_FILE = os.path.join(pathlib.Path(__file__).parent.absolute(), pathlib.Path(__file__).stem + '.json')
 
 if __name__ == "__main__":
@@ -56,7 +57,7 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 
                 for i in range(n):
                     sleep(sleep_time if i == 0 else 1)
-                    fn = f'/home/pi/Pictures/EnergySuD/{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}.jpg'
+                    fn = f'{PICTURES_PATH}/{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}.jpg'
                     camera.capture(fn, quality=camera_config['quality'])
                     logging.info(f'Saving picture to {fn}')
             except:

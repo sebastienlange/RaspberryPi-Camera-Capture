@@ -4,12 +4,12 @@ import sys
 import os
 import pathlib
 import logging
+import glob
 
 from utils import run_command, sync_dropbox
 
 from time import sleep
 from datetime import datetime, timedelta
-
 
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
 
@@ -22,25 +22,28 @@ logging.basicConfig(
     ]
 )
 
+
 def isalive():
-    
     try:
-        log_file_dt = datetime.fromtimestamp(os.path.getmtime(camera_capture.LOG_FILE))
+        list_of_files = glob.glob(os.path.join(camera_capture.PICTURES_PATH, '*.jpg'))
+        latest_file = max(list_of_files, key=os.path.getctime)
+        log_file_dt = datetime.fromtimestamp(os.path.getmtime(latest_file))
         diff = (datetime.today() - log_file_dt).total_seconds()
-        
-        if diff <= 16*60:
+
+        if diff <= 16 * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
             temp = run_command('/opt/vc/bin/vcgencmd measure_temp', should_log=False)
             temp = temp.stdout.split('=')[1].strip()
             logging.info(f'Raspberry Pi core temperature is {temp}')
         else:
-            logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff/60} minutes')
+            logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
             sync_dropbox(camera_capture.APP_NAME)
-            
+
             run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
+
 
 logging.info('+' * 80)
 logging.info('Job IsAlive scheduled to run every 5 minutes')
