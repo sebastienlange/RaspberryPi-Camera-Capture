@@ -26,7 +26,7 @@
 			"every": "minutes",
 			"interval": 5,
 			"enabled": true,
-			"command": "git -C /home/pi/Documents/RaspberryPi-Camera-Capture pull origin master",
+			"command": "git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
 			"tag": "sync app with GitHub"
 		},
 		{

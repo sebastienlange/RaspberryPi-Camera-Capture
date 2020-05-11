@@ -43,7 +43,7 @@ def do_sync_dropbox(app_name_to_watch_for_reboot):
         should_reboot = False
 
         for (src, dest) in [
-            ('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
+            #('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
             ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
             ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs'), ]:
 
