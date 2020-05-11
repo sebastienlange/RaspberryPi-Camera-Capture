@@ -43,19 +43,30 @@ def do_sync_dropbox(app_name_to_watch_for_reboot):
         should_reboot = False
 
         for (src, dest) in [
-            #('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
+            # ('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
             ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
             ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs'), ]:
 
             result = subprocess.run(f"rclone sync -v {src} {dest}".split(' '), text=True, capture_output=True)
             for std in [result.stdout, result.stderr]:
                 for log, level in clean_dropbox_log(std):
-                    app_changed = app_name_to_watch_for_reboot in log
-                    log = f'Syncing {src}/{log} to {dest}' + (
-                        ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
+                    #app_changed = app_name_to_watch_for_reboot in log
+                    log = f'Syncing {src}/{log} to {dest}' #+ (' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
                     logging.log(level, log)
-                    if app_changed:
-                        should_reboot = True
+                    #if app_changed:
+                    #    should_reboot = True
+
+        result = subprocess.run(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
+                                shell=True, text=True, capture_output=True)
+        for std in [result.stdout, result.stderr]:
+            for log, level in clean_logs(std):
+                app_changed = app_name_to_watch_for_reboot in log
+                log = f'Syncing {src}/{log} to {dest}' + (
+                    ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
+                logging.log(level, log)
+                if app_changed:
+                    should_reboot = True
+        # git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master
 
         if should_reboot:
             run_command('sudo reboot', f'Rebooting to take changes to code into account', thread=True)
