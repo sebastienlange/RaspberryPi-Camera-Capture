@@ -99,7 +99,7 @@ def schedule_job(job, camera_config):
                 else:
                     scheduled_job = scheduled_job.do(take_pictures, camera_config).tag(job['tag'])
 
-                if job['tag'] == 'execute_once':
+                if 'execute_once' in job['tag']:
                     scheduled_job.run()
                     schedule.clear(job['tag'])
 
