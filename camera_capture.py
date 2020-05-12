@@ -118,7 +118,7 @@ def schedule_job(job, camera_config):
                 if 'silent' not in job['tag']:
                     logging.info(
                         f'Scheduled to {job["tag"]} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + at if "at" in job else ""}')
-        else:
+        elif 'command' not in job:
             logging.info(
                 f'Job "{job["tag"]}" disabled: will not {job["tag"]} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + job["at"] if "at" in job else ""}')
 
