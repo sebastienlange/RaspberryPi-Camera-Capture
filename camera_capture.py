@@ -4,6 +4,7 @@ import logging.handlers
 import os
 import pathlib
 import sys
+import time
 
 import schedule
 
@@ -16,8 +17,6 @@ except ImportError:
     from fake_picamera import PiCamera
     from PIL.ImageEnhance import Color
 
-
-from time import sleep
 from datetime import datetime
 
 APP_NAME = pathlib.Path(__file__).name
@@ -87,7 +86,7 @@ def take_pictures(n=3, sleep_time=3):
                 camera.start_preview(fullscreen=False, window=tuple(camera_config['preview']['window']))
 
                 for i in range(1, n+1):
-                    sleep(sleep_time if i == 0 else 1)
+                    time.sleep(sleep_time if i == 0 else 1)
                     fn = f'{PICTURES_PATH}/{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}.jpg'
                     camera.capture(fn, quality=camera_config['quality'])
                     logging.info(f'Saving picture{" " + str(i) if n>1 else ""} to {fn}')
@@ -178,7 +177,7 @@ if __name__ == "__main__":
             config = schedule_jobs(read_config(config), config)
 
             schedule.run_pending()
-            sleep(1)
+            time.sleep(1)
 
     except:
         logging.critical(sys.exc_info()[1], exc_info=sys.exc_info())

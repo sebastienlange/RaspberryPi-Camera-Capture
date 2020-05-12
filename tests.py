@@ -37,11 +37,11 @@ class TestCameraCaptureMethods(unittest.TestCase):
 
     @patch.object(PiCamera, 'capture')
     @patch('time.sleep', return_value=None)
-    def test_take_pictures_calls_camera_capture(self, patched_time_sleep, capture):
+    def test_take_pictures_calls_camera_capture(self, mock_time_sleep, mock_capture):
         camera_capture.config = camera_capture.read_config(None)
         camera_capture.take_pictures()
 
-        capture.assert_called()
+        mock_capture.assert_called()
 
 
 if __name__ == '__main__':
