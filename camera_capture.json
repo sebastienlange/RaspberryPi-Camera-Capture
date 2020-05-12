@@ -1,11 +1,11 @@
 {
 	"camera": {
-		"resolution": [640, 480],
-		"rotation": 90,
-		"quality": 50,
 		"brightness": 50,
 		"contrast": 0,
 		"saturation": 0,
+		"quality": 50,
+		"resolution": [640, 480],
+		"rotation": 90,
 		"zoom": [0.0, 0.0, 1.0, 1.0],
 		"preview": {
 			"light_only_for_pictures": true,

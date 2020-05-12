@@ -56,7 +56,7 @@ def annotate_picture(camera, camera_config):
     camera.annotate_text_size = 14
     camera.annotate_foreground = Color('black')
     camera.annotate_background = Color('white')
-    camera.annotate_text = str({k: v for k, v in camera_config.items() if 'preview' not in k})
+    camera.annotate_text = json.dumps({k: v for k, v in camera_config.items() if 'preview' not in k}, indent=4)
 
 
 def configure_camera(camera, camera_config):
@@ -71,13 +71,14 @@ def configure_camera(camera, camera_config):
 def take_pictures(n=3, sleep_time=3):
     try:
         camera_config = config['camera']
+        light_only_for_pictures = camera_config['preview']['light_only_for_pictures']
 
         with PiCamera() as camera:
 
             try:
                 configure_camera(camera, camera_config)
 
-                if camera_config['preview']['light_only_for_pictures']:
+                if light_only_for_pictures:
                     switch_light("on")
 
                 if camera_config['preview']['annotate_config_to_pictures']:
@@ -95,7 +96,7 @@ def take_pictures(n=3, sleep_time=3):
 
             finally:
                 camera.stop_preview()
-                if camera_config['preview']['light_only_for_pictures']:
+                if light_only_for_pictures:
                     switch_light("off")
 
     except picamera.exc.PiCameraMMALError:
