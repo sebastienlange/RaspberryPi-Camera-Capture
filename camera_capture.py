@@ -4,7 +4,6 @@ import logging.handlers
 import os
 import pathlib
 import sys
-import fake_rpi
 
 import schedule
 
