@@ -36,7 +36,8 @@
 		{
 			"every": "hour",
 			"at": [":00", ":15", ":30", ":45"],
-			"tag": "take pictures"
+			"tag": "take {count} pictures",
+			"count": 2
 		},
 		{
 			"every": "seconds",
