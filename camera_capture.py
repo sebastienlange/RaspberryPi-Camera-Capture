@@ -32,6 +32,7 @@ if __name__ == "__main__":
         ]
     )
 
+
 def read_config(old_config, config_file=CONFIG_FILE):
     try:
         with open(config_file) as json_data_file:
@@ -66,9 +67,9 @@ def take_pictures(camera_config, n=3, sleep_time=3):
             finally:
                 camera.stop_preview()
 
-    except picamera.exc.PiCameraMMALError:  # suspect out of resources
+    except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
-        run_command('sudo reboot', f'Rebooting to take changes to code into account', thread=True)
+        run_command('sudo reboot', f'Suspecting PiCamera out of resources => rebooting', thread=True)
 
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())

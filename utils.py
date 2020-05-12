@@ -1,7 +1,7 @@
-import threading
 import logging
 import subprocess
 import sys
+import threading
 
 
 def run_command(command, message=None, thread=False, should_log=True):

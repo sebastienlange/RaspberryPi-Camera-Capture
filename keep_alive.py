@@ -1,15 +1,15 @@
-import camera_capture
-import schedule
-import sys
+import glob
+import logging
 import os
 import pathlib
-import logging
-import glob
-
-from utils import run_command, sync_dropbox
-
-from time import sleep
+import sys
 from datetime import datetime, timedelta
+from time import sleep
+
+import schedule
+
+import camera_capture
+from utils import run_command, sync_dropbox
 
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
 
@@ -25,6 +25,7 @@ logging.basicConfig(
 
 def isalive():
     try:
+        run_command("echo $(hostname) is hosted on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)")
         list_of_files = glob.glob(os.path.join(camera_capture.PICTURES_PATH, '*.jpg'))
         latest_file = max(list_of_files, key=os.path.getctime)
         log_file_dt = datetime.fromtimestamp(os.path.getmtime(latest_file))
