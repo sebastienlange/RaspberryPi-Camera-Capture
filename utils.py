@@ -34,10 +34,6 @@ def clean_logs(logs):
 
 
 def sync_dropbox():
-    threading.Thread(target=lambda: do_sync_dropbox()).start()
-
-
-def do_sync_dropbox():
     try:
 
         should_reboot = False
@@ -45,7 +41,8 @@ def do_sync_dropbox():
         for (src, dest) in [
             # ('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
             ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
-            ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs'), ]:
+            ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
+        ]:
 
             result = subprocess.run(f"rclone sync -v {src} {dest}".split(' '), text=True, capture_output=True)
             for std in [result.stdout, result.stderr]:

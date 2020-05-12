@@ -1,6 +1,4 @@
 import numpy as np  # type: ignore
-# import platform
-#from .wrappers import printf
 
 
 class Base(object):
@@ -13,12 +11,10 @@ class Base(object):
 class BGR(object):
     """Fake class"""
 
-    #@printf
     def __init__(self, sz):
         # constructor
         self.array = np.random.rand(*sz)
 
-    #@printf
     def truncate(self, num):
         # refreshes the fake image
         self.array = np.random.rand(*self.array.shape)
@@ -46,12 +42,10 @@ class PiCamera(Base):
         # this does nothing
         pass
 
-    #@printf
     def capture(self, output, format=None, use_video_port=False, resize=None, splitter_port=0, **options):
         # this does nothing
         pass
 
-    #@printf
     def start_preview(self, **options):
         # this does nothing
         pass

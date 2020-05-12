@@ -30,7 +30,7 @@
 		{
 			"every": "minutes",
 			"interval": 5,
-			"enabled": true,
+			"enabled": false,
 			"tag": "sync files with Dropbox"
 		},
 		{

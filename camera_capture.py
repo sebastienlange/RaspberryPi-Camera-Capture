@@ -97,6 +97,7 @@ def take_pictures(n=3, sleep_time=3):
                 camera.stop_preview()
                 if light_only_for_pictures:
                     switch_light("off")
+                sync_dropbox()
 
     except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
