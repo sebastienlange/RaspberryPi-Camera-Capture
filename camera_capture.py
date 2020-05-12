@@ -117,6 +117,9 @@ def initialize(new_config, old_config):
 
 def schedule_job(job):
     try:
+        job_tag = job['tag']
+        if 'count' in job:
+            job_tag = job_tag.format(count=job['count'])
         if ('enabled' not in job) or job['enabled']:
             at_times = job['at'] if 'at' in job else None
             at_times = at_times if isinstance(at_times, list) else [at_times]
@@ -128,20 +131,17 @@ def schedule_job(job):
 
                 if 'command' in job:
                     scheduled_job = scheduled_job.do(run_command, job['command'],
-                                                     None if 'silent' in job['tag'] else job['tag']).tag(job['tag'])
-                elif 'Dropbox' in job['tag']:
-                    scheduled_job = scheduled_job.do(sync_dropbox).tag(job['tag'])
+                                                     None if 'silent' in job_tag else job_tag).tag(job_tag)
+                elif 'Dropbox' in job_tag:
+                    scheduled_job = scheduled_job.do(sync_dropbox).tag(job_tag)
                 else:
-                    scheduled_job = scheduled_job.do(take_pictures, job['count'] if 'count' in job else 1).tag(job['tag'])
+                    scheduled_job = scheduled_job.do(take_pictures, job['count'] if 'count' in job else 1).tag(job_tag)
 
-                if 'execute_once' in job['tag']:
+                if 'execute_once' in job_tag:
                     scheduled_job.run()
-                    schedule.clear(job['tag'])
+                    schedule.clear(job_tag)
 
-                if 'silent' not in job['tag']:
-                    job_tag = job['tag']
-                    if 'count' in job:
-                        job_tag = job_tag.format(count=job['count'])
+                if 'silent' not in job_tag:
                     logging.info(
                         f'Scheduled to {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + at if "at" in job else ""}')
         elif 'command' not in job:
