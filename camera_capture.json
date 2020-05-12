@@ -7,7 +7,7 @@
 		"contrast": 0,
 		"saturation": 0,
 		"zoom": [0.0, 0.0, 1.0, 1.0],
-		"light_outside_take_pictures": "off",
+		"light_only_for_pictures": true,
 		"window": [1920, 960, 640, 480],
 		"_comment": "camera preview at bottom-right corner for 2560x1440 resolution"
 	},

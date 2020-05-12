@@ -53,7 +53,8 @@ def take_pictures(camera_config, n=3, sleep_time=3):
         with PiCamera() as camera:
 
             try:
-                switch_light("on")
+                if camera_config['light_only_for_pictures']:
+                    switch_light("on")
                 camera.resolution = tuple(camera_config['resolution'])
                 camera.rotation = camera_config['rotation']
                 camera.zoom = tuple(camera_config['zoom'])
@@ -72,7 +73,8 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 
             finally:
                 camera.stop_preview()
-                switch_light("off")
+                if camera_config['light_only_for_pictures']:
+                    switch_light("off")
 
     except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
@@ -85,9 +87,9 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 def initialize(camera_config, old_camera_config):
     if old_camera_config is None:
         logging.info(f'Starting with configuration: {camera_config}')
-        switch_light(camera_config['light_outside_take_pictures'])
-    elif camera_config['light_outside_take_pictures'] != old_camera_config['light_outside_take_pictures']:
-        switch_light(camera_config['light_outside_take_pictures'])
+        switch_light('off' if camera_config['light_only_for_pictures'] else 'on')
+    elif camera_config['light_only_for_pictures'] != old_camera_config['light_only_for_pictures']:
+        switch_light('off' if camera_config['light_only_for_pictures'] else 'on')
 
 
 def schedule_job(job, camera_config):
