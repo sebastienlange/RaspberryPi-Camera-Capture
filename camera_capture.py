@@ -11,8 +11,11 @@ from utils import run_command, sync_dropbox
 
 try:
     from picamera import PiCamera
+    from picamera import Color
 except ImportError:
     from fake_rpi.picamera import PiCamera
+    from PIL.ImageEnhance import Color
+
 
 from time import sleep
 from datetime import datetime
@@ -48,12 +51,19 @@ def switch_light(on_or_off):
     run_command(f"sudo uhubctl -l 1-1 -a {on_or_off}", should_log=False)
 
 
+def annotate_picture(camera, camera_config):
+    camera.annotate_size = 50
+    camera.annotate_foreground = Color('black')
+    camera.annotate_background = Color('white')
+    camera.annotate_text = str({k: v for k, v in camera_config.items() if 'preview' not in k})
+
+
 def take_pictures(camera_config, n=3, sleep_time=3):
     try:
         with PiCamera() as camera:
 
             try:
-                if camera_config['light_only_for_pictures']:
+                if camera_config['preview']['light_only_for_pictures']:
                     switch_light("on")
                 camera.resolution = tuple(camera_config['resolution'])
                 camera.rotation = camera_config['rotation']
@@ -61,7 +71,11 @@ def take_pictures(camera_config, n=3, sleep_time=3):
                 camera.brightness = camera_config['brightness']
                 camera.saturation = camera_config['saturation']
                 camera.contrast = camera_config['contrast']
-                camera.start_preview(fullscreen=False, window=tuple(camera_config['window']))
+
+                if camera_config['preview']['annotate_config_to_pictures']:
+                    annotate_picture(camera, camera_config)
+
+                camera.start_preview(fullscreen=False, window=tuple(camera_config['preview']['window']))
 
                 for i in range(n):
                     sleep(sleep_time if i == 0 else 1)
@@ -73,7 +87,7 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 
             finally:
                 camera.stop_preview()
-                if camera_config['light_only_for_pictures']:
+                if camera_config['preview']['light_only_for_pictures']:
                     switch_light("off")
 
     except picamera.exc.PiCameraMMALError:
@@ -87,9 +101,9 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 def initialize(camera_config, old_camera_config):
     if old_camera_config is None:
         logging.info(f'Starting with configuration: {camera_config}')
-        switch_light('off' if camera_config['light_only_for_pictures'] else 'on')
-    elif camera_config['light_only_for_pictures'] != old_camera_config['light_only_for_pictures']:
-        switch_light('off' if camera_config['light_only_for_pictures'] else 'on')
+        switch_light('off' if camera_config['preview']['light_only_for_pictures'] else 'on')
+    elif camera_config['preview']['light_only_for_pictures'] != old_camera_config['preview']['light_only_for_pictures']:
+        switch_light('off' if camera_config['preview']['light_only_for_pictures'] else 'on')
 
 
 def schedule_job(job, camera_config):
