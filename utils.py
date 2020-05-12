@@ -33,11 +33,11 @@ def clean_logs(logs):
             yield log.strip(), logging.INFO
 
 
-def sync_dropbox(app_name_to_watch_for_reboot):
-    threading.Thread(target=lambda: do_sync_dropbox(app_name_to_watch_for_reboot)).start()
+def sync_dropbox():
+    threading.Thread(target=lambda: do_sync_dropbox()).start()
 
 
-def do_sync_dropbox(app_name_to_watch_for_reboot):
+def do_sync_dropbox():
     try:
 
         should_reboot = False
@@ -58,7 +58,7 @@ def do_sync_dropbox(app_name_to_watch_for_reboot):
         for std in [result.stdout, result.stderr]:
             for log, level in clean_logs(std):
                 if level != logging.INFO or '|' in log:
-                    app_changed = app_name_to_watch_for_reboot in log
+                    app_changed = level = logging.INFO and '.py' in log
                     if level == logging.INFO:
                         log = f'Syncing {log}' + (
                             ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')

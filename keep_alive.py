@@ -39,7 +39,7 @@ def isalive():
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
-            sync_dropbox(camera_capture.APP_NAME)
+            sync_dropbox()
 
             run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
     except:
