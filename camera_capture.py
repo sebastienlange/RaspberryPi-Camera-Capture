@@ -109,7 +109,7 @@ def take_pictures(n=3, sleep_time=3):
 
 def initialize(new_config, old_config):
     if old_config is None:
-        logging.info(f'Starting with configuration: {new_config}')
+        logging.info(f'Starting with configuration: {new_config["camera"]}')
         switch_light('off' if new_config['light_only_for_pictures'] else 'on')
     elif new_config['light_only_for_pictures'] != old_config['light_only_for_pictures']:
         switch_light('off' if new_config['light_only_for_pictures'] else 'on')

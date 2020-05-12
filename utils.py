@@ -50,7 +50,7 @@ def sync_dropbox():
                     log = f'Syncing {src}/{log} to {dest}'
                     logging.log(level, log)
 
-        subprocess.run("git reset --hard", shell=True)
+        subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
         result = subprocess.run(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
                                 shell=True, text=True, capture_output=True)
         for std in [result.stdout, result.stderr]:
