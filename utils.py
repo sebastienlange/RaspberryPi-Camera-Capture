@@ -56,7 +56,7 @@ def sync_dropbox():
         for std in [result.stdout, result.stderr]:
             for log, level in clean_logs(std):
                 if level != logging.INFO or '|' in log:
-                    app_changed = level = logging.INFO and '.py' in log
+                    app_changed = level == logging.INFO and '.py' in log
                     if level == logging.INFO:
                         log = f'Syncing {log}' + (
                             ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
