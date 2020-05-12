@@ -42,8 +42,9 @@
 		{
 			"every": "seconds",
 			"interval": 10,
-			"enabled": true,
-			"tag": "take test pictures"
+			"enabled": false,
+			"tag": "take {count} test pictures",
+			"count": 2
 		}
 	]
 }
