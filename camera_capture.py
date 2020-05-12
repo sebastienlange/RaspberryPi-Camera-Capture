@@ -53,7 +53,7 @@ def switch_light(on_or_off):
 
 
 def annotate_picture(camera, camera_config):
-    camera.annotate_text_size = 50
+    camera.annotate_text_size = 14
     camera.annotate_foreground = Color('black')
     camera.annotate_background = Color('white')
     camera.annotate_text = str({k: v for k, v in camera_config.items() if 'preview' not in k})
