@@ -53,10 +53,19 @@ def switch_light(on_or_off):
 
 
 def annotate_picture(camera, camera_config):
-    camera.annotate_size = 50
+    camera.annotate_text_size = 50
     camera.annotate_foreground = Color('black')
     camera.annotate_background = Color('white')
     camera.annotate_text = str({k: v for k, v in camera_config.items() if 'preview' not in k})
+
+
+def configure_camera(camera, camera_config):
+    camera.rotation = camera_config['rotation']
+    camera.brightness = camera_config['brightness']
+    camera.saturation = camera_config['saturation']
+    camera.contrast = camera_config['contrast']
+    camera.resolution = tuple(camera_config['resolution'])
+    camera.zoom = tuple(camera_config['zoom'])
 
 
 def take_pictures(n=3, sleep_time=3):
@@ -66,14 +75,10 @@ def take_pictures(n=3, sleep_time=3):
         with PiCamera() as camera:
 
             try:
+                configure_camera(camera, camera_config)
+
                 if camera_config['preview']['light_only_for_pictures']:
                     switch_light("on")
-                camera.rotation = camera_config['rotation']
-                camera.brightness = camera_config['brightness']
-                camera.saturation = camera_config['saturation']
-                camera.contrast = camera_config['contrast']
-                camera.resolution = tuple(camera_config['resolution'])
-                camera.zoom = tuple(camera_config['zoom'])
 
                 if camera_config['preview']['annotate_config_to_pictures']:
                     annotate_picture(camera, camera_config)
