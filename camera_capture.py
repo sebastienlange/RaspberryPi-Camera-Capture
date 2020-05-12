@@ -117,9 +117,7 @@ def initialize(new_config, old_config):
 
 def schedule_job(job):
     try:
-        job_tag = job['tag']
-        if 'count' in job:
-            job_tag = job_tag.format(count=job['count'])
+        job_tag = get_job_tag(job)
         if ('enabled' not in job) or job['enabled']:
             at_times = job['at'] if 'at' in job else None
             at_times = at_times if isinstance(at_times, list) else [at_times]
@@ -146,10 +144,17 @@ def schedule_job(job):
                         f'Scheduled to {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + at if "at" in job else ""}')
         elif 'command' not in job:
             logging.info(
-                f'Job "{job["tag"]}" disabled: will not {job["tag"]} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + job["at"] if "at" in job else ""}')
+                f'Job "{job_tag}" disabled: will not {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + job["at"] if "at" in job else ""}')
 
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
+
+
+def get_job_tag(job):
+    job_tag = job['tag']
+    if 'count' in job:
+        job_tag = job_tag.format(count=job['count'])
+    return job_tag
 
 
 def schedule_jobs(new_config, old_config=None):
@@ -160,8 +165,9 @@ def schedule_jobs(new_config, old_config=None):
                                 'scheduled_jobs']):
         if job != old_job:
             if old_job is not None:
-                logging.info(f'{CONFIG_FILE} changed => cancelling job {job["tag"]}')
-                schedule.clear(job["tag"])
+                job_tag = get_job_tag(job)
+                logging.info(f'{CONFIG_FILE} changed => cancelling job {job_tag}')
+                schedule.clear(job_tag)
 
             schedule_job(job)
 
