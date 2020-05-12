@@ -8,12 +8,12 @@
 		"rotation": 90,
 		"zoom": [0.0, 0.0, 1.0, 1.0],
 		"preview": {
-			"light_only_for_pictures": true,
-			"annotate_config_to_pictures": false,
 			"window": [1920, 960, 640, 480],
 			"_window_comment": "camera preview at bottom-right corner for 2560x1440 resolution"
 		}
 	},
+	"light_only_for_pictures": true,
+	"annotate_config_to_pictures": false,
 	"scheduled_jobs":
 	[
 		{
@@ -42,7 +42,7 @@
 		{
 			"every": "seconds",
 			"interval": 10,
-			"enabled": false,
+			"enabled": true,
 			"tag": "take test pictures"
 		}
 	]

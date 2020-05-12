@@ -70,7 +70,7 @@ def configure_camera(camera, camera_config):
 def take_pictures(n=3, sleep_time=3):
     try:
         camera_config = config['camera']
-        light_only_for_pictures = camera_config['preview']['light_only_for_pictures']
+        light_only_for_pictures = config['light_only_for_pictures']
 
         with PiCamera() as camera:
 
@@ -80,7 +80,7 @@ def take_pictures(n=3, sleep_time=3):
                 if light_only_for_pictures:
                     switch_light("on")
 
-                if camera_config['preview']['annotate_config_to_pictures']:
+                if config['annotate_config_to_pictures']:
                     annotate_picture(camera, camera_config)
 
                 camera.start_preview(fullscreen=False, window=tuple(camera_config['preview']['window']))
@@ -107,12 +107,12 @@ def take_pictures(n=3, sleep_time=3):
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
 
-def initialize(camera_config, old_camera_config):
-    if old_camera_config is None:
-        logging.info(f'Starting with configuration: {camera_config}')
-        switch_light('off' if camera_config['preview']['light_only_for_pictures'] else 'on')
-    elif camera_config['preview']['light_only_for_pictures'] != old_camera_config['preview']['light_only_for_pictures']:
-        switch_light('off' if camera_config['preview']['light_only_for_pictures'] else 'on')
+def initialize(new_config, old_config):
+    if old_config is None:
+        logging.info(f'Starting with configuration: {new_config}')
+        switch_light('off' if new_config['light_only_for_pictures'] else 'on')
+    elif new_config['preview']['light_only_for_pictures'] != old_config['light_only_for_pictures']:
+        switch_light('off' if new_config['light_only_for_pictures'] else 'on')
 
 
 def schedule_job(job):
@@ -153,7 +153,7 @@ def schedule_job(job):
 
 
 def schedule_jobs(new_config, old_config=None):
-    initialize(new_config['camera'], None if old_config is None else old_config['camera'])
+    initialize(new_config, None if old_config is None else old_config)
 
     for job, old_job in zip(new_config['scheduled_jobs'],
                             [None] * len(new_config['scheduled_jobs']) if old_config is None else old_config[
