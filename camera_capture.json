@@ -14,7 +14,8 @@
 	[
 		{
 			"command": "echo Running $(hostname) on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)",
-			"tag": "silent execute_once"
+			"tag": "silent execute_once",
+			"enabled": false
 		},
 		{
 			"every": "day",

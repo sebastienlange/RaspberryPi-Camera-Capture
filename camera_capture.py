@@ -43,11 +43,17 @@ def read_config(old_config, config_file=CONFIG_FILE):
         return old_config
 
 
+def switch_light(on_or_off):
+    # turn on or off the 4 USB ports
+    run_command(f"sudo uhubctl -l 1-1 -a {on_or_off}", should_log=False)
+
+
 def take_pictures(camera_config, n=3, sleep_time=3):
     try:
         with PiCamera() as camera:
 
             try:
+                switch_light("on")
                 camera.resolution = tuple(camera_config['resolution'])
                 camera.rotation = camera_config['rotation']
                 camera.zoom = tuple(camera_config['zoom'])
@@ -66,6 +72,7 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 
             finally:
                 camera.stop_preview()
+                switch_light("off")
 
     except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
