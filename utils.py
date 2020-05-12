@@ -57,11 +57,11 @@ def do_sync_dropbox(app_name_to_watch_for_reboot):
                                 shell=True, text=True, capture_output=True)
         for std in [result.stdout, result.stderr]:
             for log, level in clean_logs(std):
-                if level != logging.INFO or all(
-                        msg not in log for msg in ['Déjà à jour', 'Depuis https://github.com', '* branch']):
+                if level != logging.INFO or '|' in log:
                     app_changed = app_name_to_watch_for_reboot in log
-                    log = f'{log}' + (
-                        ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
+                    if level == logging.INFO:
+                        log = f'Syncing {log}' + (
+                            ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
                     logging.log(level, log)
                     if app_changed:
                         should_reboot = True

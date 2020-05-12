@@ -78,8 +78,6 @@ def take_pictures(camera_config, n=3, sleep_time=3):
 def initialize(camera_config):
     logging.info(f'Starting with configuration: {camera_config}')
 
-    schedule.every().hour.do(lambda: logging.info("I'm alive"))
-
 
 def schedule_job(job, camera_config):
     try:
