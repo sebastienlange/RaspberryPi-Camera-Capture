@@ -35,7 +35,6 @@ def clean_logs(logs):
 
 def sync_dropbox():
     try:
-
         should_reboot = False
 
         for (src, dest) in [
