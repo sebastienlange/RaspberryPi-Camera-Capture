@@ -82,8 +82,12 @@ def take_pictures(camera_config, n=3, sleep_time=3):
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
 
-def initialize(camera_config):
-    logging.info(f'Starting with configuration: {camera_config}')
+def initialize(camera_config, old_camera_config):
+    if old_camera_config is None:
+        logging.info(f'Starting with configuration: {camera_config}')
+        switch_light(camera_config['light_outside_take_pictures'])
+    elif camera_config['light_outside_take_pictures'] != old_camera_config['light_outside_take_pictures']:
+        switch_light(camera_config['light_outside_take_pictures'])
 
 
 def schedule_job(job, camera_config):
@@ -121,8 +125,7 @@ def schedule_job(job, camera_config):
 
 
 def schedule_jobs(new_config, old_config=None):
-    if old_config is None:
-        initialize(new_config['camera'])
+    initialize(new_config['camera'], None if old_config is None else old_config['camera'])
 
     for job, old_job in zip(new_config['scheduled_jobs'],
                             [None] * len(new_config['scheduled_jobs']) if old_config is None else old_config[
