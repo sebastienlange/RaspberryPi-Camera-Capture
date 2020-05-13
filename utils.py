@@ -35,16 +35,14 @@ def clean_logs(logs):
 
 def sync_files():
     try:
-
         sync_logs_and_pictures()
-
-        should_reboot = sync_app()
-
-        if should_reboot:
-            run_command('sudo reboot', f'Rebooting to take changes to code into account', thread=True)
-
+        sync_app()
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
+
+
+def reboot(reason):
+    run_command('sudo reboot', reason, thread=True)
 
 
 def sync_app():
@@ -64,7 +62,8 @@ def sync_app():
                 if app_changed:
                     should_reboot = True
 
-    return should_reboot
+    if should_reboot:
+        reboot('Rebooting to take changes to code into account')
 
 
 def sync_logs_and_pictures():

@@ -1,5 +1,4 @@
 import unittest
-import re
 
 import schedule
 from mock import patch

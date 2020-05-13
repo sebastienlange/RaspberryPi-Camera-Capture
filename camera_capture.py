@@ -8,7 +8,7 @@ import time
 
 import schedule
 
-from utils import run_command, sync_files
+from utils import run_command, sync_files, reboot
 
 try:
     from picamera import PiCamera
@@ -101,7 +101,7 @@ def take_pictures(n=3, sleep_time=3):
 
     except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
-        run_command('sudo reboot', f'Suspecting PiCamera out of resources => rebooting', thread=True)
+        reboot('Suspecting PiCamera out of resources => rebooting')
 
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
