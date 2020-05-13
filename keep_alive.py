@@ -41,7 +41,7 @@ def isalive():
             logging.info('Trying to sync code before rebooting')
             sync_all_files(camera_capture.get_config()['cloud'])
 
-            run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
+            run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', ensure_log_written=True)
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 

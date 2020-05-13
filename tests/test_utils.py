@@ -27,9 +27,10 @@ class TestUtils(unittest.TestCase):
  utils.py                                 | 15 +++++++--------
  4 files changed, 26 insertions(+), 11 deletions(-)"""
 
+    @patch('time.sleep', return_value=None)
     @patch('subprocess.run', return_value=CompletedProcess(None, 0, GIT_PULL_SAMPLE_STDOUT_UPDATING_FILES, ''))
     @patch("subprocess.Popen", return_value=CompletedProcess(None, 0, io.StringIO(GIT_PULL_SAMPLE_STDOUT_UPDATING_FILES), ''))
-    def test_code_changed_force_reboot(self, patch_popen, patch_run):
+    def test_code_changed_force_reboot(self, patch_popen, patch_run, patch_sleep):
         with self.assertLogs(level='INFO') as log:
             utils.sync_app()
 
