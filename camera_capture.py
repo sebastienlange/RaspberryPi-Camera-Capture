@@ -103,7 +103,7 @@ def take_pictures(n=3, sleep_time=3):
                 camera.stop_preview()
                 if light_only_for_pictures:
                     switch_light("off")
-                sync_all_files()
+                sync_all_files(config['cloud'])
 
     except picamera.exc.PiCameraMMALError:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
@@ -137,8 +137,8 @@ def schedule_job(job):
                     scheduled_job = scheduled_job.do(run_command,
                                                      message=job['command'],
                                                      should_log=None if 'silent' in job_tag else job_tag).tag(job_tag)
-                elif 'Dropbox' in job_tag:
-                    scheduled_job = scheduled_job.do(sync_all_files).tag(job_tag)
+                #elif 'Dropbox' in job_tag:
+                #    scheduled_job = scheduled_job.do(sync_all_files, config['cloud']).tag(job_tag)
                 else:
                     scheduled_job = scheduled_job.do(take_pictures, job['count'] if 'count' in job else 1).tag(job_tag)
 

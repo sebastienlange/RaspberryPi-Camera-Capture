@@ -44,11 +44,9 @@ def do_run_command(command, should_log, format_log, should_reboot, log_after=Fal
     return popen.returncode
 
 
-def sync_all_files():
+def sync_all_files(cloud_configs):
     try:
-        config = camera_capture.get_config()
-
-        for cloud_config in config['cloud']:
+        for cloud_config in cloud_configs:
             src = cloud_config['src']
             destinations = cloud_config['dst']
             for d in (destinations if isinstance(destinations, list) else [destinations]):
@@ -64,7 +62,7 @@ def reboot(reason):
 
 
 def sync_app():
-    subprocess.run("git checkout HEAD -- " + pathlib.Path(camera_capture.LOG_FILE).name, shell=True)
+    subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
 
     return do_run_command("git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
                           should_log=lambda line: '|' in line,
