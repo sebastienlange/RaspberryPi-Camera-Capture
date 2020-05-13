@@ -1,5 +1,7 @@
+import io
 import unittest
 from subprocess import CompletedProcess
+from unittest import mock
 from unittest.mock import Mock
 from unittest.mock import patch
 
@@ -56,11 +58,11 @@ Checks:              2126 / 2126, 100%
 Transferred:            1 / 1, 100%
 Elapsed time:         1.3s"""
 
-    @patch('subprocess.run', return_value=CompletedProcess(None, 0, RCLONE_SAMPLE_STDOUT_NEW_FILE, ''))
-    def test_sync_pictures_new_file_logged(self, patch_run, new_file=SAMPLE_NEW_FILE):
+    @patch("subprocess.Popen", return_value=CompletedProcess(None, 0, io.StringIO(RCLONE_SAMPLE_STDOUT_NEW_FILE), ''))
+    def test_sync_pictures_new_file_logged(self, patch_run, new_file=SAMPLE_NEW_FILE, sample_rclone_output=RCLONE_SAMPLE_STDOUT_NEW_FILE):
+        #with patch('__main__.open', mock.mock_open(read_data=sample_rclone_output), create=True):
         with self.assertLogs(level='INFO') as log:
-            utils.sync_logs_and_pictures()
-
+            utils.sync_files('', '')
             self.assertTrue(any([new_file in log_line for log_line in log.output]))
 
 
