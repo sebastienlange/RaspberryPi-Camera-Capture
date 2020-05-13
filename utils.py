@@ -1,10 +1,7 @@
 import logging
-import pathlib
 import subprocess
 import sys
 import threading
-
-import camera_capture
 
 
 def run_command(command, message=None, thread=False, should_log=True):
