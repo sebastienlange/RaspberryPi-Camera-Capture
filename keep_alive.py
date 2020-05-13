@@ -9,7 +9,7 @@ from time import sleep
 import schedule
 
 import camera_capture
-from utils import run_command, sync_dropbox
+from utils import run_command, sync_files
 
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
 
@@ -39,7 +39,7 @@ def isalive():
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
-            sync_dropbox()
+            sync_files()
 
             run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
     except:

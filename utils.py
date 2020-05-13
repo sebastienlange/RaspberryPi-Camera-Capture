@@ -33,35 +33,12 @@ def clean_logs(logs):
             yield log.strip(), logging.INFO
 
 
-def sync_dropbox():
+def sync_files():
     try:
-        should_reboot = False
 
-        for (src, dest) in [
-            # ('dropbox:EnergySuD/RaspberryPi/Python', '/home/pi/Documents/EnergySuD'),
-            ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
-            ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
-        ]:
+        sync_logs_and_pictures()
 
-            result = subprocess.run(f"rclone sync -v {src} {dest}".split(' '), text=True, capture_output=True)
-            for std in [result.stdout, result.stderr]:
-                for log, level in clean_dropbox_log(std):
-                    log = f'Syncing {src}/{log} to {dest}'
-                    logging.log(level, log)
-
-        subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
-        result = subprocess.run(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
-                                shell=True, text=True, capture_output=True)
-        for std in [result.stdout, result.stderr]:
-            for log, level in clean_logs(std):
-                if level != logging.INFO or '|' in log:
-                    app_changed = level == logging.INFO and '.py' in log
-                    if level == logging.INFO:
-                        log = f'Syncing {log}' + (
-                            ' => WILL REBOOT AFTER DROPBOX SYNC...' if app_changed else '')
-                    logging.log(level, log)
-                    if app_changed:
-                        should_reboot = True
+        should_reboot = sync_app()
 
         if should_reboot:
             run_command('sudo reboot', f'Rebooting to take changes to code into account', thread=True)
@@ -70,7 +47,40 @@ def sync_dropbox():
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
 
-def clean_dropbox_log(logs):
+def sync_app():
+    should_reboot = False
+
+    subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
+    result = subprocess.run(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
+                            shell=True, text=True, capture_output=True)
+    for std in [result.stdout, result.stderr]:
+        for log, level in clean_logs(std):
+            if level != logging.INFO or '|' in log:
+                app_changed = level == logging.INFO and '.py' in log
+                if level == logging.INFO:
+                    log = f'Syncing {log}' + (
+                        ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
+                logging.log(level, log)
+                if app_changed:
+                    should_reboot = True
+
+    return should_reboot
+
+
+def sync_logs_and_pictures():
+    for (src, dest) in [
+        ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
+        ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
+    ]:
+
+        result = subprocess.run(f"rclone sync -v {src} {dest}".split(' '), text=True, capture_output=True)
+        for std in [result.stdout, result.stderr]:
+            for log, level in clean_rclone_log(std):
+                log = f'Syncing {src}/{log} to {dest}'
+                logging.log(level, log)
+
+
+def clean_rclone_log(logs):
     logs = logs.strip()
     for log in logs.splitlines():
         if 'ERROR' in log:
