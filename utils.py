@@ -2,7 +2,6 @@ import logging
 import subprocess
 import sys
 import threading
-import time
 
 
 def run_command(command, message=None, ensure_log_written=False, should_log=True):
