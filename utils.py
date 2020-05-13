@@ -73,7 +73,7 @@ def sync_logs_and_pictures():
         ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
     ]:
 
-        result = subprocess.run(f"rclone sync -v {src} {dest}".split(' '), text=True, capture_output=True)
+        result = subprocess.run(f"rclone sync -v --retries 2 {src} {dest}".split(' '), text=True, capture_output=True)
         for std in [result.stdout, result.stderr]:
             for log, level in clean_rclone_log(std):
                 log = f'Syncing {src}/{log} to {dest}'
