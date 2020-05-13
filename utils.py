@@ -24,20 +24,20 @@ def do_run_command(command, should_log, format_log, should_reboot, log_after=Fal
     for log, level in clean_logs(popen, should_log, format_log):
         if should_reboot(log):
             flag_reboot = True
-        if log_after:
-            lines.append((level, log))
-        else:
+        lines.append((level, log))
+        if not log_after:
             logging.log(level, log)
 
     popen.stdout.close()
 
-    for level, log in lines:
-        logging.log(level, log)
+    if log_after:
+        for level, log in lines:
+            logging.log(level, log)
 
     if flag_reboot:
         reboot('Rebooting to take changes to code into account')
 
-    return popen.returncode
+    return lines
 
 
 def sync_all_files(cloud_configs):
