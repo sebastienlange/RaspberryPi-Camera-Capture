@@ -19,7 +19,7 @@ def do_run_command(command, should_log=True):
 
     if should_log:
         for logs in [result.stdout, result.stderr]:
-            for log, level in clean_logs(logs):
+            for log, level in clean_logs(logs, lambda x: True, lambda x: x):
                 logging.log(level, log)
 
     return result
@@ -50,10 +50,11 @@ def sync_app():
 
     popen = subprocess.Popen(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
                              shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for log, level in clean_logs(popen, lambda line: '|' in line, lambda line: line.strip()):
+    for log, level in clean_logs(popen, lambda line: '|' in line,
+                                 lambda line: f'Syncing {line.strip()}'):
         app_changed = level == logging.INFO and '.py' in log and 'tests/' not in log
         if level == logging.INFO:
-            log = f'Syncing {log}' + (
+            log = log + (
                 ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
         logging.log(level, log)
         if app_changed:
@@ -68,12 +69,14 @@ def sync_files(src, dest, log_after=False):
     popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dest}", shell=True, text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for log, level in clean_logs(popen, lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
-                                 lambda line: ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])):
-        log = f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log
+                                 lambda line: f'Syncing {src}/'
+                                              + ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])
+                                              + f' to {dest}'):
+        #log = f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log
         if log_after:
             lines.append((level, log))
         else:
-            logging.log(level, f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log)
+            logging.log(level, log)
 
     popen.stdout.close()
 
