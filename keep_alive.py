@@ -33,7 +33,7 @@ def isalive():
 
         if diff <= 16 * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
-            temp = run_command('/opt/vc/bin/vcgencmd measure_temp', should_log=False)
+            temp = run_command('/opt/vc/bin/vcgencmd measure_temp', should_log=False)[0]
             logging.info(f"Raspberry Pi core temperature is {temp.split('=')[1].strip()}")
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
