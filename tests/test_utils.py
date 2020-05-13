@@ -1,13 +1,9 @@
-import logging
 import unittest
 from subprocess import CompletedProcess
+from unittest.mock import Mock
 from unittest.mock import patch
 
-from callee import Contains
-
 import utils
-
-from unittest.mock import Mock
 
 
 def assert_not_called_with(self, *args, **kwargs):
@@ -50,6 +46,23 @@ Dj  jour."""
         utils.sync_app()
         patch_run.assert_not_called_with('sudo reboot', shell=True, text=True, capture_output=True)
 
+    SAMPLE_NEW_FILE = "2020-05-13 07-45-02.jpg"
+    RCLONE_SAMPLE_STDOUT_NEW_FILE = f"""2020/05/13 08:13:09 INFO  : Dropbox root 'EnergySuD/RaspberryPi/Pictures': Waiting for checks to finish
+2020/05/13 08:13:10 INFO  : {SAMPLE_NEW_FILE}: Copied (new)
+2020/05/13 08:13:10 INFO  : Dropbox root 'EnergySuD/RaspberryPi/Pictures': Waiting for transfers to finish
+2020/05/13 08:13:10 INFO  : Waiting for deletions to finish
+2020/05/13 08:13:10 INFO  :
+Transferred:      166.349k / 166.349 kBytes, 100%, 119.121 kBytes/s, ETA 0s
+Checks:              2126 / 2126, 100%
+Transferred:            1 / 1, 100%
+Elapsed time:         1.3s"""
+
+    @patch('subprocess.run', return_value=CompletedProcess(None, 0, RCLONE_SAMPLE_STDOUT_NEW_FILE, ''))
+    def test_sync_pictures_new_file_logged(self, patch_run, new_file=SAMPLE_NEW_FILE):
+        with self.assertLogs(level='INFO') as log:
+            utils.sync_logs_and_pictures()
+
+            self.assertTrue(any([new_file in log_line for log_line in log.output]))
 
 if __name__ == '__main__':
     unittest.main()
