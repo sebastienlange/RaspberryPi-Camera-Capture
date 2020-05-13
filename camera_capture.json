@@ -14,6 +14,19 @@
 	},
 	"light_only_for_pictures": true,
 	"annotate_config_to_pictures": false,
+	"cloud": [
+		{
+			"src": "/home/pi/Pictures/EnergySuD",
+			"dst": [
+				"dropbox:EnergySuD/RaspberryPi/Pictures",
+				"dox:EcoCityTools/Photos_compteur/Jean-Marie"
+			]
+		},
+		{
+			"src": "/var/log/EnergySuD",
+			"dst": "dropbox:EnergySuD/RaspberryPi/logs"
+		}
+	],
 	"scheduled_jobs":
 	[
 		{

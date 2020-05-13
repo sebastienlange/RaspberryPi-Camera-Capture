@@ -36,7 +36,13 @@ if __name__ == "__main__":
     )
 
 
-def read_config(old_config, config_file=CONFIG_FILE):
+def get_config():
+    if config is None:
+        config = read_config()
+    return config
+
+
+def read_config(old_config=None, config_file=CONFIG_FILE):
     try:
         with open(config_file) as json_data_file:
             return json.load(json_data_file)
@@ -128,8 +134,9 @@ def schedule_job(job):
                     scheduled_job = getattr(scheduled_job, 'at')(at)
 
                 if 'command' in job:
-                    scheduled_job = scheduled_job.do(run_command, job['command'],
-                                                     None if 'silent' in job_tag else job_tag).tag(job_tag)
+                    scheduled_job = scheduled_job.do(run_command,
+                                                     message=job['command'],
+                                                     should_log=None if 'silent' in job_tag else job_tag).tag(job_tag)
                 elif 'Dropbox' in job_tag:
                     scheduled_job = scheduled_job.do(sync_all_files).tag(job_tag)
                 else:

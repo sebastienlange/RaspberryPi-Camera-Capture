@@ -2,7 +2,7 @@ import io
 import unittest
 from subprocess import CompletedProcess
 from unittest import mock
-from unittest.mock import Mock
+from unittest.mock import Mock, ANY
 from unittest.mock import patch
 
 import utils
@@ -37,7 +37,7 @@ class TestUtils(unittest.TestCase):
                 if '.py' in line and '|' in line:
                     self.assertTrue(any([line.strip() in log_line for log_line in log.output]))
 
-            patch_run.assert_called_with('sudo reboot', shell=True, text=True, capture_output=True)
+            patch_popen.assert_called_with('sudo reboot', shell=ANY, stderr=ANY, stdout=ANY, text=ANY)
 
     GIT_PULL_SAMPLE_STDOUT_ALREADY_UPDATED = """Depuis https://github.com/sebastienlange/RaspberryPi-Camera-Capture
  * branch            master     -> FETCH_HEAD

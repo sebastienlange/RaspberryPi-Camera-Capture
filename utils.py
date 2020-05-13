@@ -1,38 +1,58 @@
 import logging
+import pathlib
 import subprocess
 import sys
 import threading
+
+import camera_capture
 
 
 def run_command(command, message=None, thread=False, should_log=True):
     if message:
         logging.info(message)
 
-    if thread:
-        threading.Thread(target=lambda: do_run_command(command, should_log)).start()
-    else:
-        return do_run_command(command, should_log)
+    run = lambda: do_run_command(command,
+                                 should_log=lambda x: should_log,
+                                 format_log=lambda x: x,
+                                 should_reboot=lambda: False)
+
+    return threading.Thread(target=run).start() if thread else run()
 
 
-def do_run_command(command, should_log=True):
-    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+def do_run_command(command, should_log, format_log, should_reboot, log_after=False):
+    lines = []
+    flag_reboot = False
 
-    if should_log:
-        for logs in [result.stdout, result.stderr]:
-            for log, level in clean_logs(logs, lambda x: True, lambda x: x):
-                logging.log(level, log)
+    popen = subprocess.Popen(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    return result
+    for log, level in clean_logs(popen, should_log, format_log):
+        if should_reboot(log):
+            flag_reboot = True
+        if log_after:
+            lines.append((level, log))
+        else:
+            logging.log(level, log)
+
+    popen.stdout.close()
+
+    for level, log in lines:
+        logging.log(level, log)
+
+    if flag_reboot:
+        reboot('Rebooting to take changes to code into account')
+
+    return popen.returncode
 
 
 def sync_all_files():
     try:
-        for (src, dst) in [
-            ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
-            ('/home/pi/Pictures/EnergySuD', 'dox:EcoCityTools/Photos_compteur/Jean-Marie'),
-            ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
-        ]:
-            sync_files(src, dst, log_after='log' in src)
+        config = camera_capture.get_config()
+
+        for cloud_config in config['cloud']:
+            src = cloud_config['src']
+            destinations = cloud_config['dst']
+            for d in (destinations if isinstance(destinations, list) else [destinations]):
+                sync_files(src, d, log_after='log' in src)
 
         sync_app()
     except:
@@ -44,44 +64,23 @@ def reboot(reason):
 
 
 def sync_app():
-    should_reboot = False
+    subprocess.run("git checkout HEAD -- " + pathlib.Path(camera_capture.LOG_FILE).name, shell=True)
 
-    subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
-
-    popen = subprocess.Popen(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
-                             shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for log, level in clean_logs(popen, lambda line: '|' in line,
-                                 lambda line: f'Syncing {line.strip()}'):
-        app_changed = level == logging.INFO and '.py' in log and 'tests/' not in log
-        if level == logging.INFO:
-            log = log + (
-                ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
-        logging.log(level, log)
-        if app_changed:
-            should_reboot = True
-
-    if should_reboot:
-        reboot('Rebooting to take changes to code into account')
+    return do_run_command("git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
+                          should_log=lambda line: '|' in line,
+                          format_log=lambda line: f'Syncing {line.strip()}',
+                          should_reboot=lambda x: '.py' in x and 'tests/' not in x,
+                          log_after=False)
 
 
 def sync_files(src, dst, log_after=False):
-    lines = []
-    popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dst}", shell=True, text=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for log, level in clean_logs(popen, lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
-                                 lambda line: f'Syncing {src}/'
-                                              + ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])
-                                              + f' to {dst}'):
-        #log = f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log
-        if log_after:
-            lines.append((level, log))
-        else:
-            logging.log(level, log)
-
-    popen.stdout.close()
-
-    for level, log in lines:
-        logging.log(level, log)
+    return do_run_command(f"rclone sync -v --retries 2 {src} {dst}",
+                          should_log=lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
+                          format_log=lambda line: f'Syncing {src}/'
+                                                  + ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])
+                                                  + f' to {dst}',
+                          should_reboot=lambda x: False,
+                          log_after=log_after)
 
 
 def clean_logs(popen, should_log, format_log):
