@@ -2,16 +2,18 @@ import logging
 import subprocess
 import sys
 import threading
-from time import sleep
+import time
 
 
 def run_command(command, message=None, ensure_log_written=False, should_log=True):
-    if message:
+    if message is not None:
         logging.info(message)
-        if ensure_log_written:
-            sleep(1)
 
-    return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x, should_reboot=lambda: False)
+    if ensure_log_written:
+        threading.Thread(target=lambda: do_run_command(command, should_log=lambda x: should_log,
+                                                       format_log=lambda x: x, should_reboot=lambda: False)).start()
+    else:
+        return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x, should_reboot=lambda: False)
 
 
 def do_run_command(command, should_log, format_log, should_reboot, log_after=False):
@@ -53,7 +55,7 @@ def sync_all_files(cloud_configs):
 
 
 def reboot(reason):
-    run_command('sudo reboot', reason, ensure_log_written=True)
+    run_command('sudo reboot', message=reason, ensure_log_written=True, should_log=False)
 
 
 def sync_app():
