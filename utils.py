@@ -12,7 +12,7 @@ def run_command(command, message=None, ensure_log_written=False, should_log=True
         threading.Thread(target=lambda: do_run_command(command, should_log=lambda x: should_log,
                                                        format_log=lambda x: x, should_reboot=lambda: False)).start()
     else:
-        return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x, should_reboot=lambda: False)
+        return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x, should_reboot=lambda x: False)
 
 
 def do_run_command(command, should_log, format_log, should_reboot, log_after=False):
