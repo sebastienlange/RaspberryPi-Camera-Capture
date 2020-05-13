@@ -18,7 +18,6 @@ Mock.assert_not_called_with = assert_not_called_with
 
 
 class TestUtils(unittest.TestCase):
-
     GIT_PULL_SAMPLE_STDOUT_UPDATING_FILES = """Fast-forward
  camera_capture.py                        |  4 ++--
  tests.py => tests/test_camera_capture.py |  1 -
@@ -63,6 +62,7 @@ Elapsed time:         1.3s"""
             utils.sync_logs_and_pictures()
 
             self.assertTrue(any([new_file in log_line for log_line in log.output]))
+
 
 if __name__ == '__main__':
     unittest.main()

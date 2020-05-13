@@ -54,7 +54,7 @@ def sync_app():
     for std in [result.stdout, result.stderr]:
         for log, level in clean_logs(std):
             if level != logging.INFO or '|' in log:
-                app_changed = level == logging.INFO and '.py' in log
+                app_changed = level == logging.INFO and '.py' in log and 'tests/' not in log
                 if level == logging.INFO:
                     log = f'Syncing {log}' + (
                         ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
@@ -69,6 +69,7 @@ def sync_app():
 def sync_logs_and_pictures():
     for (src, dest) in [
         ('/home/pi/Pictures/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/Pictures'),
+        ('/home/pi/Pictures/EnergySuD', 'dox:EcoCityTools/Photos_compteur/Jean-Marie'),
         ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
     ]:
 
