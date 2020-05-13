@@ -48,7 +48,7 @@ def isalive():
 
 logging.info('+' * 80)
 logging.info('Job IsAlive scheduled to run every 5 minutes')
-schedule.every(5).minutes.do(isalive)
+schedule.every(5).minutes.do(isalive).run()
 
 while True:
     try:
