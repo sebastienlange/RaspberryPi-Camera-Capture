@@ -25,14 +25,6 @@ def do_run_command(command, should_log=True):
     return result
 
 
-def clean_logs(logs):
-    for log in logs.strip().splitlines():
-        if 'error' in log.lower():
-            yield ''.join(log[log.lower().find('error') + len('error'):]).strip(': '), logging.ERROR
-        else:
-            yield log.strip(), logging.INFO
-
-
 def sync_all_files():
     try:
         for (src, dst) in [
@@ -55,38 +47,38 @@ def sync_app():
     should_reboot = False
 
     subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
-    result = subprocess.run(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
-                            shell=True, text=True, capture_output=True)
-    for std in [result.stdout, result.stderr]:
-        for log, level in clean_logs(std):
-            if level != logging.INFO or '|' in log:
-                app_changed = level == logging.INFO and '.py' in log and 'tests/' not in log
-                if level == logging.INFO:
-                    log = f'Syncing {log}' + (
-                        ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
-                logging.log(level, log)
-                if app_changed:
-                    should_reboot = True
+
+    popen = subprocess.Popen(f"git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
+                             shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for log, level in clean_logs(popen, lambda line: '|' in line, lambda line: line.strip()):
+        app_changed = level == logging.INFO and '.py' in log and 'tests/' not in log
+        if level == logging.INFO:
+            log = f'Syncing {log}' + (
+                ' => WILL REBOOT AFTER SYNC FILES...' if app_changed else '')
+        logging.log(level, log)
+        if app_changed:
+            should_reboot = True
 
     if should_reboot:
         reboot('Rebooting to take changes to code into account')
 
 
 def sync_files(src, dest):
-        popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dest}", shell=True, text=True,
-                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for log, level in clean_rclone_log(popen):
-            log = f'Syncing {src}/{log} to {dest}'
-            logging.log(level, f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log)
+    popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dest}", shell=True, text=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for log, level in clean_logs(popen, lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
+                                 lambda line: ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])):
+        log = f'Syncing {src}/{log} to {dest}'
+        logging.log(level, f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log)
 
-        popen.stdout.close()
+    popen.stdout.close()
 
 
-def clean_rclone_log(popen):
+def clean_logs(popen, should_log, format_log):
     for stdout_line in iter(popen.stdout.readline, ""):
         stdout_line = stdout_line.strip()
         if 'error' in stdout_line.lower():
-            yield ''.join(stdout_line[stdout_line.lower().find('error') + len('error'):]).strip(': '), logging.ERROR
-        elif any(ext + ':' in stdout_line for ext in ['.jpg', '.py', '.json', '.log']):
-            stdout_line = ' '.join([l.strip() for l in stdout_line.split(':')[-2:]])
-            yield stdout_line, logging.INFO
+            yield ''.join(stdout_line[stdout_line.lower().find('error') + len('error'):]).strip(
+                ': '), logging.ERROR
+        elif should_log(stdout_line):
+            yield format_log(stdout_line), logging.INFO

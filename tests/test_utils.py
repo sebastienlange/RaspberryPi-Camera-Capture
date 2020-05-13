@@ -28,7 +28,8 @@ class TestUtils(unittest.TestCase):
  4 files changed, 26 insertions(+), 11 deletions(-)"""
 
     @patch('subprocess.run', return_value=CompletedProcess(None, 0, GIT_PULL_SAMPLE_STDOUT_UPDATING_FILES, ''))
-    def test_code_changed_force_reboot(self, patch_run):
+    @patch("subprocess.Popen", return_value=CompletedProcess(None, 0, io.StringIO(GIT_PULL_SAMPLE_STDOUT_UPDATING_FILES), ''))
+    def test_code_changed_force_reboot(self, patch_popen, patch_run):
         with self.assertLogs(level='INFO') as log:
             utils.sync_app()
 
@@ -43,9 +44,10 @@ class TestUtils(unittest.TestCase):
 Dj  jour."""
 
     @patch('subprocess.run', return_value=CompletedProcess(None, 0, GIT_PULL_SAMPLE_STDOUT_ALREADY_UPDATED, ''))
-    def test_no_code_changed_no_reboot(self, patch_run):
+    @patch("subprocess.Popen", return_value=CompletedProcess(None, 0, io.StringIO(GIT_PULL_SAMPLE_STDOUT_ALREADY_UPDATED), ''))
+    def test_no_code_changed_no_reboot(self, patch_popen, patch_run):
         utils.sync_app()
-        patch_run.assert_not_called_with('sudo reboot', shell=True, text=True, capture_output=True)
+        patch_popen.assert_not_called_with('sudo reboot', shell=True, text=True, capture_output=True)
 
     SAMPLE_NEW_FILE = "2020-05-13 07-45-02.jpg"
     RCLONE_SAMPLE_STDOUT_NEW_FILE = f"""2020/05/13 08:13:09 INFO  : Dropbox root 'EnergySuD/RaspberryPi/Pictures': Waiting for checks to finish
@@ -59,8 +61,7 @@ Transferred:            1 / 1, 100%
 Elapsed time:         1.3s"""
 
     @patch("subprocess.Popen", return_value=CompletedProcess(None, 0, io.StringIO(RCLONE_SAMPLE_STDOUT_NEW_FILE), ''))
-    def test_sync_pictures_new_file_logged(self, patch_run, new_file=SAMPLE_NEW_FILE, sample_rclone_output=RCLONE_SAMPLE_STDOUT_NEW_FILE):
-        #with patch('__main__.open', mock.mock_open(read_data=sample_rclone_output), create=True):
+    def test_sync_pictures_new_file_logged(self, patch_run, new_file=SAMPLE_NEW_FILE):
         with self.assertLogs(level='INFO') as log:
             utils.sync_files('', '')
             self.assertTrue(any([new_file in log_line for log_line in log.output]))
