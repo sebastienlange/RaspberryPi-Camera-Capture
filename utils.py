@@ -32,7 +32,7 @@ def sync_all_files():
             ('/home/pi/Pictures/EnergySuD', 'dox:EcoCityTools/Photos_compteur/Jean-Marie'),
             ('/var/log/EnergySuD', 'dropbox:EnergySuD/RaspberryPi/logs')
         ]:
-            sync_files(src, dst)
+            sync_files(src, dst, log_after='log' in src)
 
         sync_app()
     except:
@@ -64,14 +64,14 @@ def sync_app():
         reboot('Rebooting to take changes to code into account')
 
 
-def sync_files(src, dest, log_after=False):
+def sync_files(src, dst, log_after=False):
     lines = []
-    popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dest}", shell=True, text=True,
+    popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dst}", shell=True, text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for log, level in clean_logs(popen, lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
                                  lambda line: f'Syncing {src}/'
                                               + ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])
-                                              + f' to {dest}'):
+                                              + f' to {dst}'):
         #log = f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log
         if log_after:
             lines.append((level, log))
