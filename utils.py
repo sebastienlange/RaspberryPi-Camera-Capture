@@ -63,15 +63,22 @@ def sync_app():
         reboot('Rebooting to take changes to code into account')
 
 
-def sync_files(src, dest):
+def sync_files(src, dest, log_after=False):
+    lines = []
     popen = subprocess.Popen(f"rclone sync -v --retries 2 {src} {dest}", shell=True, text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for log, level in clean_logs(popen, lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
                                  lambda line: ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])):
-        log = f'Syncing {src}/{log} to {dest}'
-        logging.log(level, f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log)
+        log = f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log
+        if log_after:
+            lines.append((level, log))
+        else:
+            logging.log(level, f'Syncing {src}/{log} to {dest}' if level == logging.INFO else log)
 
     popen.stdout.close()
+
+    for level, log in lines:
+        logging.log(level, log)
 
 
 def clean_logs(popen, should_log, format_log):
