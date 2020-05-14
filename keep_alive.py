@@ -26,6 +26,8 @@ logging.basicConfig(
 def isalive():
     try:
         run_command("echo $(hostname) is hosted on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)")
+        run_command("echo $(hostname) core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
+
         list_of_files = glob.glob(os.path.join(camera_capture.PICTURES_PATH, '*.jpg'))
         latest_file = max(list_of_files, key=os.path.getctime)
         log_file_dt = datetime.fromtimestamp(os.path.getmtime(latest_file))
@@ -33,7 +35,6 @@ def isalive():
 
         if diff <= 16 * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
-            run_command(f"echo Raspberry Pi core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
