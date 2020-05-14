@@ -33,14 +33,13 @@ def isalive():
 
         if diff <= 16 * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
-            temp = run_command('/opt/vc/bin/vcgencmd measure_temp', should_log=False)[0]
-            logging.info(f"Raspberry Pi core temperature is {temp.split('=')[1].strip()}")
+            logging.info(f"Raspberry Pi core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
             sync_all_files(camera_capture.get_config()['cloud'])
 
-            run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', ensure_log_written=True)
+            run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
