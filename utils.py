@@ -12,7 +12,8 @@ def run_command(command, message=None, ensure_log_written=False, should_log=True
         threading.Thread(target=lambda: do_run_command(command, should_log=lambda x: should_log,
                                                        format_log=lambda x: x, should_reboot=lambda: False)).start()
     else:
-        return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x, should_reboot=lambda x: False)
+        return do_run_command(command, should_log=lambda x: should_log, format_log=lambda x: x,
+                              should_reboot=lambda x: False)
 
 
 def do_run_command(command, should_log, format_log, should_reboot, log_after=False):
@@ -60,10 +61,11 @@ def reboot(reason):
 def sync_app():
     subprocess.run("git checkout HEAD -- camera_capture.json", shell=True)
 
+    should_reboot = lambda x: '.py' in x and 'tests/' not in x
     return do_run_command("git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
                           should_log=lambda line: '|' in line,
-                          format_log=lambda line: f'Syncing {line.strip()}',
-                          should_reboot=lambda x: '.py' in x and 'tests/' not in x,
+                          format_log=lambda line: f'Syncing {line.strip()}' + (' => => WILL REBOOT AFTER CLOUD SYNC...' if should_reboot(line) else ''),
+                          should_reboot=should_reboot,
                           log_after=False)
 
 
