@@ -70,7 +70,7 @@ def sync_app():
 def sync_files(src, dst, log_after=False):
     return do_run_command(f"rclone sync -v --retries 2 {src} {dst}",
                           should_log=lambda line: any(ext + ':' in line for ext in ['.jpg', '.py', '.json', '.log']),
-                          format_log=lambda line: f'Syncing {src}/'
+                          format_log=lambda line: f'Syncing '
                                                   + ' '.join([sub_line.strip() for sub_line in line.split(':')[-2:]])
                                                   + f' to {dst}',
                           should_reboot=lambda x: False,
