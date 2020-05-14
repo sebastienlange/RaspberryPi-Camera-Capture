@@ -148,7 +148,7 @@ def schedule_job(job):
 
                 if 'silent' not in job_tag:
                     logging.info(
-                        f'Scheduled to {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + at if "at" in job else ""}')
+                        f'Scheduled to {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"] if "every" in job else ""}{" at " + at if "at" in job else ""}')
         elif 'command' not in job:
             logging.info(
                 f'Job "{job_tag}" disabled: will not {job_tag} every {str(job["interval"]) + " " if "interval" in job else ""}{job["every"]}{" at " + job["at"] if "at" in job else ""}')
