@@ -1,7 +1,6 @@
 import io
 import unittest
 from subprocess import CompletedProcess
-from unittest import mock
 from unittest.mock import Mock, ANY
 from unittest.mock import patch
 
