@@ -33,7 +33,7 @@ def isalive():
 
         if diff <= 16 * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
-            logging.info(f"Raspberry Pi core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
+            run_command(f"echo Raspberry Pi core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
