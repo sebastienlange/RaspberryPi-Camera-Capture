@@ -64,7 +64,7 @@ def sync_app():
     should_reboot = lambda x: '.py' in x and 'tests/' not in x
     return do_run_command("git -C /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture pull origin master",
                           should_log=lambda line: '|' in line,
-                          format_log=lambda line: f'Syncing {line.strip()}' + (' => => WILL REBOOT AFTER CLOUD SYNC...' if should_reboot(line) else ''),
+                          format_log=lambda line: f'Syncing {line.strip()}' + (' => WILL REBOOT AFTER CLOUD SYNC...' if should_reboot(line) else ''),
                           should_reboot=should_reboot,
                           log_after=False)
 
