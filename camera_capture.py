@@ -165,7 +165,7 @@ def get_job_tag(job):
 
 
 def schedule_jobs(new_config, old_config=None):
-    initialize(new_config, None if old_config is None else old_config)
+    initialize(new_config, old_config)
 
     for job, old_job in zip(new_config['scheduled_jobs'],
                             [None] * len(new_config['scheduled_jobs']) if old_config is None else old_config[
@@ -177,6 +177,9 @@ def schedule_jobs(new_config, old_config=None):
                 schedule.clear(job_tag)
 
             schedule_job(job)
+
+    if old_config is None:
+        logging.info('')
 
     return new_config
 
