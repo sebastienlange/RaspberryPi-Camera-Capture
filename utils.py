@@ -52,6 +52,8 @@ def sync_all_files(cloud_configs):
         sync_app()
     except:
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
+    finally:
+        logging.info('')
 
 
 def reboot(reason):
