@@ -13,14 +13,15 @@ from utils import run_command, sync_all_files
 
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.handlers.TimedRotatingFileHandler(LOG_FILE, when='midnight'),
-        logging.StreamHandler()
-    ]
-)
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.handlers.TimedRotatingFileHandler(LOG_FILE, when='midnight'),
+            logging.StreamHandler()
+        ]
+    )
 
 
 def isalive():
@@ -38,7 +39,7 @@ def isalive():
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
             logging.info('Trying to sync code before rebooting')
-            sync_all_files(camera_capture.get_config()['cloud'])
+            sync_all_files(camera_capture.read_config()['cloud'])
 
             run_command('sudo reboot', f'Rebooting to force restart of {camera_capture.APP_NAME}', thread=True)
     except:
@@ -49,9 +50,10 @@ logging.info('+' * 80)
 logging.info('Job IsAlive scheduled to run every 5 minutes')
 schedule.every(5).minutes.do(isalive).run()
 
-while True:
-    try:
-        schedule.run_pending()
-        sleep(1)
-    except:
-        logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
+if __name__ == "__main__":
+    while True:
+        try:
+            schedule.run_pending()
+            sleep(1)
+        except:
+            logging.error(sys.exc_info()[1], exc_info=sys.exc_info())

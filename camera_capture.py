@@ -36,12 +36,6 @@ if __name__ == "__main__":
     )
 
 
-def get_config():
-    if config is None:
-        config = read_config()
-    return config
-
-
 def read_config(old_config=None, config_file=CONFIG_FILE):
     try:
         with open(config_file) as json_data_file:
