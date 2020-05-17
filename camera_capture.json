@@ -30,12 +30,7 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo cat /etc/adjtime",
-			"tag": "execute_once",
-			"enabled": true
-		},
-		{
-			"command": "sudo cat /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture/camera_capture.json",
+			"command": "sudo find / -name '*adjtime*.*",
 			"tag": "execute_once",
 			"enabled": true
 		},
