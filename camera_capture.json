@@ -30,9 +30,9 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "echo Running $(hostname) on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)",
+			"command": "cat /var/lib/hwclock/adjtime",
 			"tag": "silent execute_once",
-			"enabled": false
+			"enabled": true
 		},
 		{
 			"every": "day",
