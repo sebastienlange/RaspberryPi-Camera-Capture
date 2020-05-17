@@ -30,7 +30,7 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo find / -name '*adjtime*.*",
+			"command": "sudo find / -name '*adjtime*.*'",
 			"tag": "execute_once",
 			"enabled": true
 		},
