@@ -30,13 +30,13 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo cat /var/lib/hwclock/adjtime",
-			"tag": "silent execute_once",
+			"command": "sudo cat /etc/adjtime",
+			"tag": "execute_once",
 			"enabled": true
 		},
 		{
-			"command": "sudo cat /etc/rc.conf",
-			"tag": "silent execute_once",
+			"command": "sudo cat /home/pi/Documents/EnergySuD/RaspberryPi-Camera-Capture/camera_capture.json",
+			"tag": "execute_once",
 			"enabled": true
 		},
 		{
