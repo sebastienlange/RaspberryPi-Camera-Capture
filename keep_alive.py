@@ -12,6 +12,7 @@ import camera_capture
 from utils import run_command, sync_all_files
 
 LOG_FILE = f'/var/log/EnergySuD/{pathlib.Path(__file__).stem}.log'
+MAX_MINUTES_BEFORE_REBOOT = 16
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -24,17 +25,19 @@ if __name__ == "__main__":
     )
 
 
-def isalive():
+def isalive(pictures_path=os.path.join(camera_capture.PICTURES_PATH, '*.jpg')):
     try:
-        run_command("echo $(hostname) is hosted on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)")
-        run_command("echo $(hostname) core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
+        run_command(
+            "echo $(hostname) is hosted on $(hostname -I | cut -d' ' -f1) through router $(curl --silent api.ipify.org)")
+        run_command(
+            "echo $(hostname) core temperature is $(/opt/vc/bin/vcgencmd measure_temp | grep 'temp=' | sed 's/^.*=//')")
 
-        list_of_files = glob.glob(os.path.join(camera_capture.PICTURES_PATH, '*.jpg'))
+        list_of_files = glob.glob(pictures_path)
         latest_file = max(list_of_files, key=os.path.getctime)
         log_file_dt = datetime.fromtimestamp(os.path.getmtime(latest_file))
         diff = (datetime.today() - log_file_dt).total_seconds()
 
-        if diff <= 16 * 60:
+        if diff <= MAX_MINUTES_BEFORE_REBOOT * 60:
             logging.info(f'{camera_capture.APP_NAME} was running {timedelta(seconds=diff)} ago')
         else:
             logging.error(f'{camera_capture.APP_NAME} is NOT running since {diff / 60} minutes')
@@ -46,11 +49,11 @@ def isalive():
         logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
 
-logging.info('+' * 80)
-logging.info('Job IsAlive scheduled to run every 5 minutes')
-schedule.every(5).minutes.do(isalive).run()
-
 if __name__ == "__main__":
+    logging.info('+' * 80)
+    logging.info('Job IsAlive scheduled to run every 5 minutes')
+    schedule.every(5).minutes.do(isalive).run()
+
     while True:
         try:
             schedule.run_pending()

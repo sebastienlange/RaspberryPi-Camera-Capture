@@ -4,11 +4,11 @@ import sys
 import threading
 
 
-def run_command(command, message=None, ensure_log_written=False, should_log=True):
+def run_command(command, message=None, thread=False, should_log=True):
     if message is not None:
         logging.info(message)
 
-    if ensure_log_written:
+    if thread:
         threading.Thread(target=lambda: do_run_command(command, should_log=lambda x: should_log,
                                                        format_log=lambda x: x, should_reboot=lambda: False)).start()
     else:
@@ -17,28 +17,31 @@ def run_command(command, message=None, ensure_log_written=False, should_log=True
 
 
 def do_run_command(command, should_log, format_log, should_reboot, log_after=False):
-    lines = []
-    flag_reboot = False
+    try:
+        lines = []
+        flag_reboot = False
 
-    popen = subprocess.Popen(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        popen = subprocess.Popen(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    for log, level in clean_logs(popen, should_log, format_log):
-        if should_reboot(log):
-            flag_reboot = True
-        lines.append((level, log))
-        if not log_after:
-            logging.log(level, log)
+        for log, level in clean_logs(popen, should_log, format_log):
+            if should_reboot(log):
+                flag_reboot = True
+            lines.append((level, log))
+            if not log_after:
+                logging.log(level, log)
 
-    popen.stdout.close()
+        popen.stdout.close()
 
-    if log_after:
-        for level, log in lines:
-            logging.log(level, log)
+        if log_after:
+            for level, log in lines:
+                logging.log(level, log)
 
-    if flag_reboot:
-        reboot('Rebooting to take changes to code into account')
+        if flag_reboot:
+            reboot('Rebooting to take changes to code into account')
+    except:
+        logging.error(sys.exc_info()[1], exc_info=sys.exc_info())
 
-    return lines
+    #return lines
 
 
 def sync_all_files(cloud_configs):
@@ -57,7 +60,7 @@ def sync_all_files(cloud_configs):
 
 
 def reboot(reason):
-    run_command('sudo reboot', message=reason, ensure_log_written=True, should_log=False)
+    run_command('sudo reboot', message=reason, thread=True, should_log=False)
 
 
 def sync_app():
