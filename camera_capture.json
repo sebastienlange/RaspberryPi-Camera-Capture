@@ -30,7 +30,12 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "cat /var/lib/hwclock/adjtime",
+			"command": "sudo cat /var/lib/hwclock/adjtime",
+			"tag": "silent execute_once",
+			"enabled": true
+		},
+		{
+			"command": "sudo cat /etc/rc.conf",
 			"tag": "silent execute_once",
 			"enabled": true
 		},
