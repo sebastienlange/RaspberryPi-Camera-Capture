@@ -6,7 +6,7 @@
 		"quality": 50,
 		"resolution": [640, 480],
 		"rotation": 90,
-		"zoom": [0.3, 0.75, 0.4, 0.75],
+		"zoom": [0.2, 0.85, 0.2, 0.85],
 		"preview": {
 			"window": [1920, 960, 640, 480],
 			"_comment": "camera preview at bottom-right corner for 2560x1440 resolution"
