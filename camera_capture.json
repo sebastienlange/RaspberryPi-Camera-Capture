@@ -55,7 +55,7 @@
 		{
 			"every": "minutes",
 			"interval": 2,
-			"enabled": true,
+			"enabled": false,
 			"tag": "take {count} test pictures",
 			"count": 2
 		}
