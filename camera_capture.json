@@ -30,7 +30,7 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo rm /home/pi/Pictures/EnergySuD/2020-05-*.jpg",
+			"command": "sudo rm '/home/pi/Pictures/EnergySuD/2020-05-*.jpg'",
 			"tag": "execute_once",
 			"enabled": true
 		},
