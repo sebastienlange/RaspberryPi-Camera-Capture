@@ -30,7 +30,7 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo find /home/pi/Pictures/EnergySuD/ -type f -mtime +5 -exec mv '{}' /home/pi/Pictures/backup \\;",
+			"command": "sudo find /home/pi/Pictures/EnergySuD/ -type f -mtime +3 -exec mv '{}' /home/pi/Pictures/backup \\;",
 			"tag": "execute_once",
 			"enabled": true
 		},
