@@ -30,7 +30,7 @@
 	"scheduled_jobs":
 	[
 		{
-			"command": "sudo rm -- '/home/pi/Pictures/EnergySuD/2020-05-*.jpg'",
+			"command": "sudo find /home/pi/Pictures/EnergySuD/ -type f -mtime +5 -exec mv '{}' /home/pi/Pictures/backup \\;",
 			"tag": "execute_once",
 			"enabled": true
 		},
