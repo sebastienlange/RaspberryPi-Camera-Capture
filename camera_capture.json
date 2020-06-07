@@ -18,13 +18,12 @@
 		{
 			"src": "/home/pi/Pictures/EnergySuD",
 			"dst": [
-				"dropbox:EnergySuD/RaspberryPi/Pictures",
-				"dox:Photos_compteur/Jean-Marie"
+				"dox:RaspberryPi/Pictures/Jean-Marie"
 			]
 		},
 		{
 			"src": "/var/log/EnergySuD",
-			"dst": "dropbox:EnergySuD/RaspberryPi/logs"
+			"dst": "dox:RaspberryPi/logs"
 		}
 	],
 	"scheduled_jobs":
