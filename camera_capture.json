@@ -17,9 +17,7 @@
 	"cloud": [
 		{
 			"src": "/home/pi/Pictures/EnergySuD",
-			"dst": [
-				"dox:RaspberryPi/Pictures/Jean-Marie"
-			]
+			"dst": [ "dox:RaspberryPi/Pictures/Jean-Marie" ]
 		},
 		{
 			"src": "/var/log/EnergySuD",
