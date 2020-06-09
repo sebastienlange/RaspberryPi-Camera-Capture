@@ -30,7 +30,7 @@ class TestCameraCaptureMethods(unittest.TestCase):
         config = camera_capture.schedule_jobs(camera_capture.read_config(config), config)
         count = config['scheduled_jobs'][3]['count']
 
-        self.assertTrue(any([f'take {count} pictures' in job.tags for job in schedule.jobs]))
+        self.assertTrue(any(['take {count} pictures' in job.tags for job in schedule.jobs]))
 
         take_picture_jobs = [job for job in schedule.jobs if 'take pictures' in job.tags]
         expected_job_count = sum([len(job['at']) for job in config['scheduled_jobs'] if job['tag'] == 'take pictures'])

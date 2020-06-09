@@ -130,11 +130,11 @@ def schedule_job(job):
                 if 'command' in job:
                     scheduled_job = scheduled_job.do(run_command,
                                                      command=job['command'],
-                                                     message=None if 'silent' in job_tag else job_tag).tag(job_tag)
+                                                     message=None if 'silent' in job_tag else job_tag).tag(job['tag'])
                 #elif 'Dropbox' in job_tag:
                 #    scheduled_job = scheduled_job.do(sync_all_files, config['cloud']).tag(job_tag)
                 else:
-                    scheduled_job = scheduled_job.do(take_pictures, job['count'] if 'count' in job else 1).tag(job_tag)
+                    scheduled_job = scheduled_job.do(take_pictures, job['count'] if 'count' in job else 1).tag(job['tag'])
 
                 if 'execute_once' in job_tag:
                     scheduled_job.run()
@@ -166,7 +166,7 @@ def schedule_jobs(new_config, old_config=None):
                                 'scheduled_jobs']):
         if job != old_job:
             if old_job is not None:
-                job_tag = get_job_tag(job)
+                job_tag = job['tag']
                 logging.info(f'{CONFIG_FILE} changed => cancelling job {job_tag}')
                 schedule.clear(job_tag)
 
